@@ -50,6 +50,17 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+{{- if .Values.config }}
+{{- if .Values.config.database }}
+{{- $sql_impl := substr 0 5 (toString .Values.config.database.default) -}}
+{{- if eq "mysql" $sql_impl}}
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/usr/bin/yum", "install", "MySQL-python", "-y",]
+{{- end }}
+{{- end }}
+{{- end }}
           livenessProbe:
             httpGet:
               path: /ping
