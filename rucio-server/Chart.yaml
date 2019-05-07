@@ -7,7 +7,7 @@ keywords:
   - science
 home: https://rucio.cern.ch/
 sources:
-  - https://github.com/rucio/rucio
+  - https://github.com/arisfkiaras/rucio
 maintainers:
   - name: Thomas Beermann
     email: thomas.beermann@cern.ch
