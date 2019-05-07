@@ -50,6 +50,12 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+{{- if .Values.config.database }}
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/usr/bin/touch", "/second",]
+{{- end }}
           livenessProbe:
             httpGet:
               path: /ping
