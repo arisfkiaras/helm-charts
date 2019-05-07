@@ -1,15 +1,15 @@
-{{- if gt .Values.hermesCount 0.0 -}}
+{{- if gt .Values.conveyorTransferSubmitterCount 0.0 -}}
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-hermes
+  name: {{ .Release.Name }}-conveyor-transfer-submitter
   labels:
     app: {{ template "rucio.name" . }}
     chart: {{ template "rucio.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  replicas: {{ .Values.hermesCount }}
+  replicas: {{ .Values.conveyorTransferSubmitterCount }}
   selector:
     matchLabels:
       app: {{ template "rucio.name" . }}
@@ -29,10 +29,22 @@ spec:
         app: {{ template "rucio.name" . }}
         release: {{ .Release.Name }}
     spec:
+      volumes:
+      - name: proxy-volume
+        secret:
+          secretName: {{ .Release.Name }}-rucio-x509up
+      - name: ca-volume
+        secret:
+          secretName: {{ .Release.Name }}-rucio-ca-bundle
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - name: proxy-volume
+              mountPath: /opt/proxy
+            - name: ca-volume
+              mountPath: /opt/certs
           env:
             {{- range $key1, $val1 := .Values.config }}
             {{- range $key2, $val2 := $val1}}
@@ -44,7 +56,7 @@ spec:
             {{- end}}
             {{- end}}
             - name: RUCIO_DAEMON
-              value: "hermes"
+              value: "conveyor-transfer-submitter"
             - name: RUCIO_DAEMON_ARGS
-              value: "--threads {{ .Values.hermes.threads }} --bulk {{ .Values.hermes.bulk }} --delay {{ .Values.hermes.delay }}"
+              value: "--total-threads {{ .Values.conveyorTransferSubmitter.threads }} --activities {{ .Values.conveyorTransferSubmitter.activities }} --sleep-time {{ .Values.conveyorTransferSubmitter.sleepTime }}"
 {{ end }}
