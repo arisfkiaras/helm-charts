@@ -18,11 +18,7 @@ filters:
 outputs:
   main: |-
     output {
-      # Send message in JSON form to CERN monit
-      http {
-        http_method => "post"
-        id => "monit_http_output"
-        url => "http://monit-HOST.cern.ch:10012/"
-        format => "json"
-      }
+      elasticsearch {
+        hosts => ["ES-HOST:9200"]
+        }
     }
